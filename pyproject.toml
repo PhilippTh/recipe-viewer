@@ -11,6 +11,13 @@ dependencies = [
     "uvicorn>=0.38.0",
 ]
 
+[dependency-groups]
+dev = [
+    "django-stubs>=5.2.7",
+    "mypy>=1.18.2",
+    "ruff>=0.14.4",
+]
+
 [tool.ruff]
 line-length = 120
 
@@ -65,3 +72,9 @@ force-single-line = true
 
 [tool.ruff.lint.mccabe]
 max-complexity = 10
+
+[tool.mypy]
+plugins = ["mypy_django_plugin.main"]
+
+[tool.django-stubs]
+django_settings_module = "recipe_viewer.settings"

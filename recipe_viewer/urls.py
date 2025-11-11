@@ -14,17 +14,21 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from django.contrib import admin
-from django.urls import path
+
 from django.conf import settings
 from django.conf.urls.static import static
-from recipe_viewer.apps.recipes.views import recipe_list, recipe_detail, recipe_ingredients
+from django.contrib import admin
+from django.urls import path
+
+from recipe_viewer.apps.recipes.views import recipe_detail
+from recipe_viewer.apps.recipes.views import recipe_ingredients
+from recipe_viewer.apps.recipes.views import recipe_list
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('', recipe_list, name='recipe_list'),
-    path('recipe/<int:recipe_id>/', recipe_detail, name='recipe_detail'),
-    path('recipe/<int:recipe_id>/ingredients/', recipe_ingredients, name='recipe_ingredients'),
+    path("admin/", admin.site.urls),
+    path("", recipe_list, name="recipe_list"),
+    path("recipe/<int:recipe_id>/", recipe_detail, name="recipe_detail"),
+    path("recipe/<int:recipe_id>/ingredients/", recipe_ingredients, name="recipe_ingredients"),
 ]
 
 # Serve media files in development
