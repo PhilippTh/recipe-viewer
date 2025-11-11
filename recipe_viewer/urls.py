@@ -16,7 +16,17 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from django.conf import settings
+from django.conf.urls.static import static
+from recipe_viewer.apps.recipes.views import recipe_list, recipe_detail, recipe_ingredients
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('', recipe_list, name='recipe_list'),
+    path('recipe/<int:recipe_id>/', recipe_detail, name='recipe_detail'),
+    path('recipe/<int:recipe_id>/ingredients/', recipe_ingredients, name='recipe_ingredients'),
 ]
+
+# Serve media files in development
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
