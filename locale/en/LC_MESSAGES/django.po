@@ -1,0 +1,132 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-11-11 22:09+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: recipe_viewer/apps/recipes/models.py:8
+#: recipe_viewer/apps/recipes/models.py:30
+msgid "Name"
+msgstr ""
+
+#: recipe_viewer/apps/recipes/models.py:9
+msgid "Quantity"
+msgstr ""
+
+#: recipe_viewer/apps/recipes/models.py:10
+msgid "Unit"
+msgstr ""
+
+#: recipe_viewer/apps/recipes/models.py:12
+#: recipe_viewer/apps/recipes/models.py:37
+msgid "Recipe"
+msgstr ""
+
+#: recipe_viewer/apps/recipes/models.py:15
+msgid "Ingredient"
+msgstr ""
+
+#: recipe_viewer/apps/recipes/models.py:16
+#: recipe_viewer/templates/recipes/recipe_detail.html:22
+msgid "Ingredients"
+msgstr ""
+
+#: recipe_viewer/apps/recipes/models.py:20
+#, python-format
+msgid "%(quantity)s %(unit)s of %(name)s"
+msgstr ""
+
+#: recipe_viewer/apps/recipes/models.py:31
+msgid "Steps"
+msgstr ""
+
+#: recipe_viewer/apps/recipes/models.py:32
+msgid "Created at"
+msgstr ""
+
+#: recipe_viewer/apps/recipes/models.py:33
+msgid "Updated at"
+msgstr ""
+
+#: recipe_viewer/apps/recipes/models.py:34
+msgid "Image"
+msgstr ""
+
+#: recipe_viewer/apps/recipes/models.py:38
+#: recipe_viewer/templates/recipes/recipe_list.html:4
+msgid "Recipes"
+msgstr ""
+
+#: recipe_viewer/settings.py:112
+msgid "German"
+msgstr ""
+
+#: recipe_viewer/settings.py:113
+msgid "English"
+msgstr ""
+
+#: recipe_viewer/templates/base.html:7
+#: recipe_viewer/templates/recipes/recipe_detail.html:4
+#: recipe_viewer/templates/recipes/recipe_list.html:4
+msgid "Recipe Viewer"
+msgstr ""
+
+#: recipe_viewer/templates/recipes/_ingredients.html:10
+msgid "No ingredients added yet."
+msgstr ""
+
+#: recipe_viewer/templates/recipes/recipe_detail.html:8
+msgid "Back to Recipes"
+msgstr ""
+
+#: recipe_viewer/templates/recipes/recipe_detail.html:13
+#: recipe_viewer/templates/recipes/recipe_list.html:27
+msgid "Added"
+msgstr ""
+
+#: recipe_viewer/templates/recipes/recipe_detail.html:13
+msgid "Updated"
+msgstr ""
+
+#: recipe_viewer/templates/recipes/recipe_detail.html:26
+msgid "Portions"
+msgstr ""
+
+#: recipe_viewer/templates/recipes/recipe_detail.html:47
+msgid "Instructions"
+msgstr ""
+
+#: recipe_viewer/templates/recipes/recipe_list.html:7
+msgid "All Recipes"
+msgstr ""
+
+#: recipe_viewer/templates/recipes/recipe_list.html:9
+#, python-format
+msgid ""
+"\n"
+"        %(counter)s recipe\n"
+"    "
+msgid_plural ""
+"\n"
+"        %(counter)s recipes\n"
+"    "
+msgstr[0] ""
+msgstr[1] ""
+
+#: recipe_viewer/templates/recipes/recipe_list.html:34
+msgid "No recipes yet. Add some recipes in the admin panel!"
+msgstr ""

@@ -1,15 +1,16 @@
 {% extends 'base.html' %}
+{% load i18n %}
 
-{% block title %}{{ recipe.name }} - Recipe Viewer{% endblock %}
+{% block title %}{{ recipe.name }} - {% trans "Recipe Viewer" %}{% endblock %}
 
 {% block content %}
 <a href="{% url 'recipe_list' %}" class="inline-block mb-3 text-blue-600 hover:text-blue-800 hover:underline transition-colors text-sm">
-    ← Back to Recipes
+    ← {% trans "Back to Recipes" %}
 </a>
 
 <div class="mb-4">
     <h1 class="text-2xl font-bold text-slate-800 mb-1">{{ recipe.name }}</h1>
-    <p class="text-xs text-gray-500">Added {{ recipe.created_at|date:"F d, Y" }} • Updated {{ recipe.updated_at|date:"F d, Y" }}</p>
+    <p class="text-xs text-gray-500">{% trans "Added" %} {{ recipe.created_at|date:"DATE_FORMAT" }} • {% trans "Updated" %} {{ recipe.updated_at|date:"DATE_FORMAT" }}</p>
 </div>
 
 {% if recipe.image %}
@@ -18,11 +19,11 @@
 
 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
     <div>
-        <h2 class="text-xl font-bold text-slate-800 mb-2">Ingredients</h2>
+        <h2 class="text-xl font-bold text-slate-800 mb-2">{% trans "Ingredients" %}</h2>
         
         <div class="bg-gray-50 rounded-lg p-3">
             <div class="flex items-center gap-2 pb-2 mb-2 border-b border-gray-300">
-                <label for="portions" class="text-sm font-semibold text-slate-800">Portions:</label>
+                <label for="portions" class="text-sm font-semibold text-slate-800">{% trans "Portions" %}:</label>
                 <input 
                     type="number" 
                     id="portions" 
@@ -43,7 +44,7 @@
     </div>
 
     <div>
-        <h2 class="text-xl font-bold text-slate-800 mb-2">Instructions</h2>
+        <h2 class="text-xl font-bold text-slate-800 mb-2">{% trans "Instructions" %}</h2>
         <div class="bg-gray-50 rounded-lg p-3 whitespace-pre-wrap leading-normal text-sm">{{ recipe.steps }}</div>
     </div>
 </div>

@@ -23,12 +23,14 @@ from django.urls import path
 from recipe_viewer.apps.recipes.views import recipe_detail
 from recipe_viewer.apps.recipes.views import recipe_ingredients
 from recipe_viewer.apps.recipes.views import recipe_list
+from recipe_viewer.apps.recipes.views import set_language
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("", recipe_list, name="recipe_list"),
     path("recipe/<int:recipe_id>/", recipe_detail, name="recipe_detail"),
     path("recipe/<int:recipe_id>/ingredients/", recipe_ingredients, name="recipe_ingredients"),
+    path("set_language/", set_language, name="set_language"),
 ]
 
 # Serve media files in development

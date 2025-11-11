@@ -1,10 +1,17 @@
 {% extends 'base.html' %}
+{% load i18n %}
 
-{% block title %}Recipes - Recipe Viewer{% endblock %}
+{% block title %}{% trans "Recipes" %} - {% trans "Recipe Viewer" %}{% endblock %}
 
 {% block content %}
-<h1 class="text-4xl font-bold text-slate-800 mb-2">All Recipes</h1>
-<p class="text-gray-600 mb-6">{{ recipes|length }} recipe{{ recipes|length|pluralize }}</p>
+<h1 class="text-4xl font-bold text-slate-800 mb-2">{% trans "All Recipes" %}</h1>
+<p class="text-gray-600 mb-6">
+    {% blocktrans count counter=recipes|length %}
+        {{ counter }} recipe
+    {% plural %}
+        {{ counter }} recipes
+    {% endblocktrans %}
+</p>
 
 {% if recipes %}
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
@@ -17,14 +24,14 @@
                     <div class="w-full h-48 bg-gray-200 rounded-md mb-4"></div>
                 {% endif %}
                 <h2 class="text-xl font-semibold text-slate-800 mb-2 group-hover:text-blue-600 transition-colors">{{ recipe.name }}</h2>
-                <p class="text-sm text-gray-500">Added {{ recipe.created_at|date:"F d, Y" }}</p>
+                <p class="text-sm text-gray-500">{% trans "Added" %} {{ recipe.created_at|date:"DATE_FORMAT" }}</p>
             </div>
         </a>
         {% endfor %}
     </div>
 {% else %}
     <div class="text-center text-gray-500 py-16">
-        <p class="text-lg">No recipes yet. Add some recipes in the admin panel!</p>
+        <p class="text-lg">{% trans "No recipes yet. Add some recipes in the admin panel!" %}</p>
     </div>
 {% endif %}
 {% endblock %}
