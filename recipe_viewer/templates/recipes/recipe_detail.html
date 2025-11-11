@@ -3,44 +3,49 @@
 {% block title %}{{ recipe.name }} - Recipe Viewer{% endblock %}
 
 {% block content %}
-<a href="{% url 'recipe_list' %}" class="inline-block mb-6 text-blue-600 hover:text-blue-800 hover:underline transition-colors">
+<a href="{% url 'recipe_list' %}" class="inline-block mb-3 text-blue-600 hover:text-blue-800 hover:underline transition-colors text-sm">
     ← Back to Recipes
 </a>
 
-<div class="mb-8">
-    <h1 class="text-4xl font-bold text-slate-800 mb-2">{{ recipe.name }}</h1>
-    <p class="text-sm text-gray-500">Added {{ recipe.created_at|date:"F d, Y" }} • Updated {{ recipe.updated_at|date:"F d, Y" }}</p>
+<div class="mb-4">
+    <h1 class="text-2xl font-bold text-slate-800 mb-1">{{ recipe.name }}</h1>
+    <p class="text-xs text-gray-500">Added {{ recipe.created_at|date:"F d, Y" }} • Updated {{ recipe.updated_at|date:"F d, Y" }}</p>
 </div>
 
 {% if recipe.image %}
-    <img src="{{ recipe.image.url }}" alt="{{ recipe.name }}" class="w-full max-h-96 object-cover rounded-lg mb-8">
+    <img src="{{ recipe.image.url }}" alt="{{ recipe.name }}" class="w-full max-h-64 object-cover rounded-lg mb-4">
 {% endif %}
 
-<div class="bg-gray-100 rounded-lg p-6 mb-8">
-    <label for="serving_size" class="text-lg font-semibold text-slate-800 mr-3">Serving Size:</label>
-    <input 
-        type="number" 
-        id="serving_size" 
-        name="serving_size" 
-        value="1"
-        min="0.5"
-        step="0.5"
-        class="w-24 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-        data-bind="serving_size"
-        data-on:input="@get('{% url 'recipe_ingredients' recipe.id %}')"
-    >
-</div>
-
-<div class="mb-8">
-    <h2 class="text-3xl font-bold text-slate-800 mb-4">Ingredients</h2>
-    <div id="ingredients-container" class="bg-gray-50 rounded-lg p-6">
-        {% include 'recipes/_ingredients.html' %}
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div>
+        <h2 class="text-xl font-bold text-slate-800 mb-2">Ingredients</h2>
+        
+        <div class="bg-gray-50 rounded-lg p-3">
+            <div class="flex items-center gap-2 pb-2 mb-2 border-b border-gray-300">
+                <label for="portions" class="text-sm font-semibold text-slate-800">Portions:</label>
+                <input 
+                    type="number" 
+                    id="portions" 
+                    name="portions" 
+                    value="1"
+                    min="0.5"
+                    step="0.5"
+                    class="w-20 px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    data-bind="portions"
+                    data-on:input="@get('{% url 'recipe_ingredients' recipe.id %}')"
+                >
+            </div>
+            
+            <div id="ingredients-container">
+                {% include 'recipes/_ingredients.html' %}
+            </div>
+        </div>
     </div>
-</div>
 
-<div>
-    <h2 class="text-3xl font-bold text-slate-800 mb-4">Instructions</h2>
-    <div class="bg-gray-50 rounded-lg p-6 whitespace-pre-wrap leading-relaxed">{{ recipe.steps }}</div>
+    <div>
+        <h2 class="text-xl font-bold text-slate-800 mb-2">Instructions</h2>
+        <div class="bg-gray-50 rounded-lg p-3 whitespace-pre-wrap leading-normal text-sm">{{ recipe.steps }}</div>
+    </div>
 </div>
 {% endblock %}
 

@@ -1,12 +1,12 @@
 <div id="ingredients">
     <ul class="list-none p-0">
         {% for ingredient in ingredients %}
-        <li class="py-3 border-b border-gray-200 last:border-b-0">
+        <li class="py-1.5 border-b border-gray-200 last:border-b-0 text-sm">
             <span class="font-semibold">{{ ingredient.quantity }}</span> {{ ingredient.unit }} {{ ingredient.name }}
         </li>
         {% endfor %}
         {% if not ingredients %}
-        <li class="py-3 text-gray-500">No ingredients added yet.</li>
+        <li class="py-1.5 text-gray-500 text-sm">No ingredients added yet.</li>
         {% endif %}
     </ul>
 </div>

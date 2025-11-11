@@ -21,7 +21,7 @@ async def recipe_list(request: HttpRequest) -> HttpResponse:
 
 
 async def recipe_detail(request: HttpRequest, recipe_id: int) -> HttpResponse:
-    """Display recipe details with serving size input (default=1)"""
+    """Display recipe details with portions input (default=1)"""
     recipe: Recipe = await aget_object_or_404(Recipe, id=recipe_id)
     ingredients: list[Ingredient] = [ingredient async for ingredient in recipe.ingredients.all()]
 
@@ -37,7 +37,7 @@ async def recipe_detail(request: HttpRequest, recipe_id: int) -> HttpResponse:
 
 @datastar_response
 async def recipe_ingredients(request: HttpRequest, recipe_id: int) -> AsyncGenerator[Any, None]:
-    """Return updated ingredients HTML based on serving_size parameter"""
+    """Return updated ingredients HTML based on portions parameter"""
     recipe: Recipe = await aget_object_or_404(Recipe, id=recipe_id)
     ingredients: list[Ingredient] = [ingredient async for ingredient in recipe.ingredients.all()]
     signals: dict[str, Any] | None = read_signals(request)
@@ -45,9 +45,9 @@ async def recipe_ingredients(request: HttpRequest, recipe_id: int) -> AsyncGener
     if signals is None:
         signals = {}
 
-    # Calculate quantities based on serving size
+    # Calculate quantities based on portions
     calculated_ingredients: list[dict[str, Any]] = [
-        {"name": ing.name, "quantity": ing.quantity * signals["serving_size"], "unit": ing.unit} for ing in ingredients
+        {"name": ing.name, "quantity": ing.quantity * signals["portions"], "unit": ing.unit} for ing in ingredients
     ]
 
     rendered_html: str = render_to_string("recipes/_ingredients.html", {"ingredients": calculated_ingredients})
