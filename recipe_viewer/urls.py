@@ -20,8 +20,9 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path
 
+from recipe_viewer.apps.recipes.views import RecipeChangeView
+from recipe_viewer.apps.recipes.views import RecipeCreateView
 from recipe_viewer.apps.recipes.views import RecipeDetailView
-from recipe_viewer.apps.recipes.views import edit_recipe
 from recipe_viewer.apps.recipes.views import recipe_ingredients
 from recipe_viewer.apps.recipes.views import recipe_list
 from recipe_viewer.apps.recipes.views import set_language
@@ -29,8 +30,9 @@ from recipe_viewer.apps.recipes.views import set_language
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("", recipe_list, name="recipe_list"),
+    path("recipe/create/", RecipeCreateView.as_view(), name="recipe_create"),
     path("recipe/<int:recipe_id>/", RecipeDetailView.as_view(), name="recipe_detail"),
-    path("recipe/<int:recipe_id>/edit/", edit_recipe, name="recipe_edit"),
+    path("recipe/<int:recipe_id>/change/", RecipeChangeView.as_view(), name="recipe_change"),
     path("recipe/<int:recipe_id>/ingredients/", recipe_ingredients, name="recipe_ingredients"), # type: ignore[arg-type]
     path("set_language/", set_language, name="set_language"),
 ]

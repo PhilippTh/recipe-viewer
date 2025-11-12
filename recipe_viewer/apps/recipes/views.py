@@ -15,6 +15,8 @@ from django.urls import reverse
 from django.utils import translation
 from django.views import View
 
+from recipe_viewer.apps.recipes.forms import IngredientFormSet
+from recipe_viewer.apps.recipes.forms import RecipeForm
 from recipe_viewer.apps.recipes.models import Ingredient
 from recipe_viewer.apps.recipes.models import Recipe
 
@@ -23,6 +25,49 @@ async def recipe_list(request: HttpRequest) -> HttpResponse:
     """Display list of all recipes"""
     recipes: list[Recipe] = [recipe async for recipe in Recipe.objects.all().order_by("-created_at")]
     return render(request, "recipes/recipe_list.html", {"recipes": recipes})
+
+
+class RecipeCreateView(View):
+    async def get(self, request: HttpRequest) -> HttpResponse:
+        """Display recipe creation form"""
+        form = RecipeForm()
+        ingredient_formset = IngredientFormSet()
+        return render(
+            request, 
+            "recipes/recipe_creation_form.html", 
+            {
+                "recipe": Recipe(),
+                "form": form,
+                "ingredient_formset": ingredient_formset,
+            }
+        )
+
+    async def post(self, request: HttpRequest) -> HttpResponse:
+        """Create recipe"""
+        form = RecipeForm(request.POST, request.FILES)
+        ingredient_formset = IngredientFormSet(request.POST)
+        
+        if form.is_valid() and ingredient_formset.is_valid():
+            # Save the recipe
+            recipe = await form.asave()
+            
+            # Save the ingredients linked to the recipe
+            ingredient_formset.instance = recipe
+            await ingredient_formset.asave()
+            
+            # Redirect to the recipe detail page
+            return redirect("recipe_detail", recipe_id=recipe.id)
+        
+        # If form is invalid, re-render with errors
+        return render(
+            request,
+            "recipes/recipe_creation_form.html",
+            {
+                "recipe": Recipe(),
+                "form": form,
+                "ingredient_formset": ingredient_formset,
+            }
+        )
 
 
 class RecipeDetailView(View):
@@ -48,19 +93,49 @@ class RecipeDetailView(View):
         await recipe.adelete()
         return redirect("recipe_list")
 
+
+class RecipeChangeView(View):
+    async def get(self, request: HttpRequest, recipe_id: int) -> HttpResponse:
+        """Display recipe change form"""
+        recipe: Recipe = await aget_object_or_404(Recipe, id=recipe_id)
+        form = RecipeForm(instance=recipe)
+        ingredient_formset = IngredientFormSet(instance=recipe)
+        return render(
+            request,
+            "recipes/recipe_creation_form.html",
+            {
+                "recipe": recipe,
+                "form": form,
+                "ingredient_formset": ingredient_formset,
+            }
+        )
+
     async def post(self, request: HttpRequest, recipe_id: int) -> HttpResponse:
         """Update recipe"""
         recipe: Recipe = await aget_object_or_404(Recipe, id=recipe_id)
-        await recipe.save()
-
-        return
-
-async def edit_recipe(request: HttpRequest, recipe_id: int) -> HttpResponse:
-    """Edit recipe"""
-    recipe: Recipe = await aget_object_or_404(Recipe, id=recipe_id)
-    return render(request, "recipes/recipe_edit.html", {"recipe": recipe})
-
-
+        form = RecipeForm(request.POST, request.FILES, instance=recipe)
+        ingredient_formset = IngredientFormSet(request.POST, instance=recipe)
+        
+        if form.is_valid() and ingredient_formset.is_valid():
+            # Save the recipe
+            recipe = await form.asave()
+            
+            # Save the ingredients
+            await ingredient_formset.asave()
+            
+            # Redirect to the recipe detail page
+            return redirect("recipe_detail", recipe_id=recipe.id)
+        
+        # If form is invalid, re-render with errors
+        return render(
+            request,
+            "recipes/recipe_creation_form.html",
+            {
+                "recipe": recipe,
+                "form": form,
+                "ingredient_formset": ingredient_formset,
+            }
+        )
 
 @datastar_response
 async def recipe_ingredients(request: HttpRequest, recipe_id: int) -> AsyncGenerator[Any, None]:
