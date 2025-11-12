@@ -11,7 +11,9 @@ from django.shortcuts import aget_object_or_404
 from django.shortcuts import redirect
 from django.shortcuts import render
 from django.template.loader import render_to_string
+from django.urls import reverse
 from django.utils import translation
+from django.views import View
 
 from recipe_viewer.apps.recipes.models import Ingredient
 from recipe_viewer.apps.recipes.models import Recipe
@@ -23,19 +25,41 @@ async def recipe_list(request: HttpRequest) -> HttpResponse:
     return render(request, "recipes/recipe_list.html", {"recipes": recipes})
 
 
-async def recipe_detail(request: HttpRequest, recipe_id: int) -> HttpResponse:
-    """Display recipe details with portions input (default=1)"""
-    recipe: Recipe = await aget_object_or_404(Recipe, id=recipe_id)
-    ingredients: list[Ingredient] = [ingredient async for ingredient in recipe.ingredients.all()]
+class RecipeDetailView(View):
+    async def get(self, request: HttpRequest, recipe_id: int) -> HttpResponse:
+        """Display recipe details with portions input (default=1)"""
+        recipe: Recipe = await aget_object_or_404(Recipe, id=recipe_id)
+        ingredients: list[Ingredient] = [ingredient async for ingredient in recipe.ingredients.all()]
 
-    return render(
-        request,
-        "recipes/recipe_detail.html",
-        {
-            "recipe": recipe,
-            "ingredients": ingredients,
-        },
-    )
+        user = await request.auser()
+
+        can_change = await user.ahas_perm("recipes.change_recipe")
+        can_delete = await user.ahas_perm("recipes.delete_recipe")
+        return render(request, "recipes/recipe_detail.html", {"recipe": recipe, "ingredients": ingredients, "can_change": can_change, "can_delete": can_delete})
+
+    async def delete(self, request: HttpRequest, recipe_id: int) -> HttpResponse:
+        """Delete recipe"""
+        # Check permission
+        user = await request.auser()
+        if not await user.ahas_perm("recipes.delete_recipe"):
+            return HttpResponse("Permission denied", status=403)
+        
+        recipe: Recipe = await aget_object_or_404(Recipe, id=recipe_id)
+        await recipe.adelete()
+        return redirect("recipe_list")
+
+    async def post(self, request: HttpRequest, recipe_id: int) -> HttpResponse:
+        """Update recipe"""
+        recipe: Recipe = await aget_object_or_404(Recipe, id=recipe_id)
+        await recipe.save()
+
+        return
+
+async def edit_recipe(request: HttpRequest, recipe_id: int) -> HttpResponse:
+    """Edit recipe"""
+    recipe: Recipe = await aget_object_or_404(Recipe, id=recipe_id)
+    return render(request, "recipes/recipe_edit.html", {"recipe": recipe})
+
 
 
 @datastar_response
