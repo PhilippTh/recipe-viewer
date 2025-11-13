@@ -17,8 +17,44 @@ A clean, modern Django-based recipe viewing application with real-time ingredien
 - **Backend**: Django 5.2+ (async views)
 - **Frontend**: Datastar.js for reactive UI updates
 - **Styling**: TailwindCSS
+- **Deployment**: Docker & Docker Compose with Nginx
 
 ## Quick Start
+
+### Option 1: Docker
+
+1. **Copy environment file**:
+   ```bash
+   cp .env.example .env
+   ```
+
+2. **Edit `.env` file** with your configuration:
+   - Change `SECRET_KEY` to a secure random string
+   - Update `POSTGRES_PASSWORD` to a strong password
+   - Set `DEBUG=False` for production
+
+3. **Build and start containers**:
+   ```bash
+   make docker-build
+   make docker-up
+   ```
+
+4. **View logs**:
+   ```bash
+   make docker-logs
+   ```
+
+5. Visit `http://localhost` to view recipes
+
+**Docker Commands**:
+- `make docker-build` - Build Docker images
+- `make docker-up` - Start containers
+- `make docker-down` - Stop containers
+- `make docker-logs` - View logs
+- `make docker-restart` - Restart containers
+- `make docker-clean` - Remove containers and volumes
+
+### Option 2: Local Development
 
 1. **Install dependencies** (using [uv](https://github.com/astral-sh/uv)):
    ```bash

@@ -29,7 +29,7 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("", recipe_list, name="recipe_list"),
     path("recipe/<int:recipe_id>/", recipe_detail, name="recipe_detail"),
-    path("recipe/<int:recipe_id>/ingredients/", recipe_ingredients, name="recipe_ingredients"),
+    path("recipe/<int:recipe_id>/ingredients/", recipe_ingredients, name="recipe_ingredients"),  # type: ignore[arg-type]
     path("set_language/", set_language, name="set_language"),
 ]
 
