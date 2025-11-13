@@ -1,6 +1,7 @@
 from collections.abc import AsyncGenerator
 from typing import Any
 
+from datastar_py.consts import ElementPatchMode
 from datastar_py.django import ServerSentEventGenerator
 from datastar_py.django import datastar_response
 from datastar_py.django import read_signals
@@ -155,6 +156,29 @@ async def recipe_ingredients(request: HttpRequest, recipe_id: int) -> AsyncGener
     rendered_html: str = render_to_string("recipes/_ingredients.html", {"ingredients": calculated_ingredients})
 
     yield ServerSentEventGenerator.patch_elements(rendered_html)
+
+
+@datastar_response
+async def add_ingredient_form(request: HttpRequest) -> AsyncGenerator[Any, None]:
+    """Stream a new empty ingredient form to append to the ingredients list"""
+    formset = IngredientFormSet()
+    
+    # Render the form HTML
+    rendered_html = render_to_string(
+        "recipes/_ingredient_form.html",
+        {
+            "ingredient_form": formset.empty_form,
+        },
+        request=request,
+    )
+    
+    # Stream the new form and append it to the ingredients container
+    yield ServerSentEventGenerator.patch_elements(
+        rendered_html,
+        selector="#ingredients-list",
+        mode=ElementPatchMode.APPEND,
+    )
+    
 
 
 async def set_language(request: HttpRequest) -> HttpResponse:

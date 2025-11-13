@@ -1,0 +1,36 @@
+{% load i18n %}
+<div class="ingredient-form-item">
+    <div class="grid grid-cols-12 gap-2 items-center">
+        <div class="col-span-3">
+            {{ ingredient_form.quantity }}
+            {% if ingredient_form.quantity.errors %}
+                <div class="text-red-600 text-xs mt-1">{{ ingredient_form.quantity.errors }}</div>
+            {% endif %}
+        </div>
+        <div class="col-span-3">
+            {{ ingredient_form.unit }}
+            {% if ingredient_form.unit.errors %}
+                <div class="text-red-600 text-xs mt-1">{{ ingredient_form.unit.errors }}</div>
+            {% endif %}
+        </div>
+        <div class="col-span-5">
+            {{ ingredient_form.name }}
+            {% if ingredient_form.name.errors %}
+                <div class="text-red-600 text-xs mt-1">{{ ingredient_form.name.errors }}</div>
+            {% endif %}
+        </div>
+        <div class="col-span-1 flex items-center justify-center">
+            <button 
+                type="button" 
+                class="text-red-600 hover:text-red-800 cursor-pointer" 
+                title="{% trans 'Remove' %}"
+                data-on:click="el.closest('.ingredient-form-item').remove()"
+            >
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+    </div>
+</div>
+
