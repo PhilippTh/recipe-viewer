@@ -64,19 +64,19 @@ async def set_language(request: HttpRequest) -> HttpResponse:
     This is a synchronous view as it works with cookies and sessions.
     """
     language_code = request.POST.get("language", request.GET.get("language", settings.LANGUAGE_CODE))
-    
+
     # Validate language code
     if language_code not in [lang[0] for lang in settings.LANGUAGES]:
         language_code = settings.LANGUAGE_CODE
-    
+
     # Activate the language for the current thread
     translation.activate(language_code)
-    
+
     # Get the redirect URL (either from POST/GET or fallback to referer or home)
     next_url = request.POST.get("next", request.GET.get("next", request.META.get("HTTP_REFERER", "/")))
-    
+
     response = redirect(next_url)
-    
+
     # Set the language cookie so it persists across requests
     response.set_cookie(
         settings.LANGUAGE_COOKIE_NAME,
@@ -88,5 +88,5 @@ async def set_language(request: HttpRequest) -> HttpResponse:
         httponly=settings.LANGUAGE_COOKIE_HTTPONLY if hasattr(settings, "LANGUAGE_COOKIE_HTTPONLY") else False,
         samesite=settings.LANGUAGE_COOKIE_SAMESITE if hasattr(settings, "LANGUAGE_COOKIE_SAMESITE") else None,
     )
-    
+
     return response
