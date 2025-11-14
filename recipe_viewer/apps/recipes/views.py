@@ -123,6 +123,7 @@ class RecipeChangeView(View):
 
 
 @datastar_response
+@require_http_methods(["GET"])
 async def recipe_ingredients(request: HttpRequest, recipe_id: int) -> AsyncGenerator[Any, None]:
     """Return updated ingredients HTML based on portions parameter"""
     recipe: Recipe = await aget_object_or_404(Recipe, id=recipe_id)
@@ -150,7 +151,7 @@ def _extract_formset_prefix(data: dict[str, Any]) -> str | None:
 
 
 @require_http_methods(["POST"])
-def add_ingredient_form(request: HttpRequest) -> HttpResponse:
+async def add_ingredient_form(request: HttpRequest) -> HttpResponse:
     """Morph the entire ingredient section after add/remove actions."""
     data = request.POST.copy()
     action = data.get("form_action")
@@ -164,7 +165,7 @@ def add_ingredient_form(request: HttpRequest) -> HttpResponse:
             recipe_pk = int(recipe_id)
         except (TypeError, ValueError):
             return HttpResponseBadRequest("Invalid recipe id.")
-        recipe = get_object_or_404(Recipe, id=recipe_pk)
+        recipe = await aget_object_or_404(Recipe, id=recipe_pk)
 
     prefix = _extract_formset_prefix(data)
     if prefix is None:
