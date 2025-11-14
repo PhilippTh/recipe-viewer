@@ -2,11 +2,14 @@ from django import forms
 from django.forms import inlineformset_factory
 from django.utils.translation import gettext_lazy as _
 
-from recipe_viewer.apps.recipes.models import Ingredient, Recipe
+from recipe_viewer.apps.recipes.models import Ingredient
+from recipe_viewer.apps.recipes.models import Recipe
 
 
 class RecipeForm(forms.ModelForm):
     """Form for creating and editing recipes"""
+
+    use_required_attribute = False
 
     class Meta:
         model = Recipe
@@ -35,6 +38,8 @@ class RecipeForm(forms.ModelForm):
 
 class IngredientForm(forms.ModelForm):
     """Form for creating and editing ingredients"""
+
+    use_required_attribute = False
 
     class Meta:
         model = Ingredient
@@ -72,4 +77,3 @@ IngredientFormSet = inlineformset_factory(
     min_num=1,  # Require at least one ingredient
     validate_min=True,
 )
-

@@ -2,8 +2,9 @@
 {% load i18n %}
 
 {% block content %}
-<form method="post" enctype="multipart/form-data" class="bg-white rounded-lg shadow-lg">
+<form method="post" enctype="multipart/form-data" class="bg-white rounded-lg shadow-lg" id="recipe-form">
     {% csrf_token %}
+    <input type="hidden" name="recipe_id" value="{{ recipe.pk|default_if_none:'' }}">
 
     <div class="border-b border-gray-200 px-6 py-4 flex justify-between items-start">
         <div>
@@ -47,32 +48,7 @@
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 px-6 py-4">
         <div>
-            <div class="flex justify-between items-center mb-2">
-                <h2 class="text-xl font-bold text-slate-800">{% trans "Ingredients" %}</h2>
-                <button 
-                    type="button"
-                    class="px-3 py-1 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
-                    title="{% trans 'Add Ingredient' %}"
-                    data-on:click="@get('{% url "add_ingredient_form" %}')"
-                >
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-                    </svg>
-                </button>
-            </div>
-            <div class="bg-gray-50 rounded-lg p-3">
-                {{ ingredient_formset.management_form }}
-                
-                <div id="ingredients-list" class="space-y-2">
-                    {% for ingredient_form in ingredient_formset %}
-                        {% include 'recipes/_ingredient_form.html' %}
-                    {% endfor %}
-                </div>
-                
-                {% if ingredient_formset.non_form_errors %}
-                    <div class="text-red-600 text-sm mt-2">{{ ingredient_formset.non_form_errors }}</div>
-                {% endif %}
-            </div>
+            {% include "recipes/_ingredient_section.html" %}
         </div>
 
         <div>

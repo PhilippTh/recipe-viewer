@@ -1,5 +1,14 @@
 {% load i18n %}
-<div class="ingredient-form-item">
+{% with is_deleted=ingredient_form.DELETE.value %}
+<div class="ingredient-form-item{% if is_deleted %} hidden{% endif %}" data-ingredient-form>
+    <div class="hidden">
+        {% if ingredient_form.id %}
+            {{ ingredient_form.id }}
+        {% endif %}
+        {% if ingredient_form.DELETE %}
+            {{ ingredient_form.DELETE.as_hidden }}
+        {% endif %}
+    </div>
     <div class="grid grid-cols-12 gap-2 items-center">
         <div class="col-span-3">
             {{ ingredient_form.quantity }}
@@ -21,16 +30,24 @@
         </div>
         <div class="col-span-1 flex items-center justify-center">
             <button 
-                type="button" 
-                class="text-red-600 hover:text-red-800 cursor-pointer" 
+                type="button"
+                name="form_action"
+                value="remove:{{ ingredient_form.prefix }}"
+                formnovalidate
+                class="text-red-600 hover:text-red-800 cursor-pointer"
                 title="{% trans 'Remove' %}"
-                data-on:click="el.closest('.ingredient-form-item').remove()"
+                data-on:click="@post('{% url 'add_ingredient_form' %}', { contentType: 'form', selector: '#recipe-form', headers: {'X-CSRFToken': '{{ csrf_token }}'} })"
             >
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                 </svg>
             </button>
         </div>
+        {% if ingredient_form.non_field_errors %}
+            <div class="col-span-12 text-red-600 text-xs mt-1">
+                {{ ingredient_form.non_field_errors }}
+            </div>
+        {% endif %}
     </div>
 </div>
-
+{% endwith %}
