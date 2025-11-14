@@ -53,7 +53,7 @@ async def _render_recipe_form(
     }
     return await sync_to_async(render)(
         request=request,
-        template_name="recipes/recipe_creation_form.html",
+        template_name="recipes/recipe_form.html",
         context=context,
         status=status,
     )
@@ -70,6 +70,7 @@ async def recipe_list(request: HttpRequest) -> HttpResponse:
 
 class RecipeCreateView(View):
     """Shared logic for creating and editing recipes with their ingredients."""
+
     async def get(self, request: HttpRequest) -> HttpResponse:
         form, ingredient_formset = _build_recipe_forms(request)
         return await _render_recipe_form(
@@ -235,14 +236,16 @@ async def add_ingredient_form(request: HttpRequest) -> HttpResponse:
         return HttpResponseBadRequest("Unknown form action.")
 
     formset_instance = recipe if recipe is not None else Recipe()
-    ingredient_formset = IngredientFormSet(
-        data=data,
-        files=request.FILES,
-        instance=formset_instance,
-        prefix=prefix,
-    )
+    ingredient_formset = await sync_to_async(
+        lambda: IngredientFormSet(
+            data=data,
+            files=request.FILES,
+            instance=formset_instance,
+            prefix=prefix,
+        )
+    )()
 
-    rendered_section = render_to_string(
+    rendered_section = await sync_to_async(render_to_string)(
         "recipes/_ingredient_section.html",
         {
             "ingredient_formset": ingredient_formset,
