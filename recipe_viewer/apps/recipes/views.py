@@ -12,10 +12,10 @@ from django.http import HttpRequest
 from django.http import HttpResponse
 from django.http import HttpResponseBadRequest
 from django.shortcuts import aget_object_or_404
-from django.shortcuts import get_object_or_404
 from django.shortcuts import redirect
 from django.shortcuts import render
 from django.template.loader import render_to_string
+from django.urls import reverse
 from django.utils import translation
 from django.views import View
 from django.views.decorators.http import require_http_methods
@@ -35,19 +35,28 @@ def _build_recipe_forms(request: HttpRequest, recipe: Recipe | None = None) -> t
     return form, ingredient_formset
 
 
-def _render_recipe_form(
+async def _render_recipe_form(
     request: HttpRequest,
     form: RecipeForm,
     ingredient_formset: IngredientFormSet,
     recipe: Recipe | None = None,
     status: int = 200,
+    action_url: str | None = None,
+    cancel_url: str | None = None,
 ) -> HttpResponse:
     context = {
         "recipe": recipe if recipe is not None else Recipe(),
         "form": form,
         "ingredient_formset": ingredient_formset,
+        "form_action": action_url or request.path,
+        "cancel_url": cancel_url or reverse("recipe_list"),
     }
-    return render(request, "recipes/recipe_creation_form.html", context, status=status)
+    return await sync_to_async(render)(
+        request=request,
+        template_name="recipes/recipe_creation_form.html",
+        context=context,
+        status=status,
+    )
 
 
 @require_http_methods(["GET"])
@@ -59,21 +68,36 @@ async def recipe_list(request: HttpRequest) -> HttpResponse:
 
 class RecipeCreateView(View):
     """Shared logic for creating and editing recipes with their ingredients."""
-
     async def get(self, request: HttpRequest) -> HttpResponse:
         form, ingredient_formset = _build_recipe_forms(request)
-        return _render_recipe_form(request, form=form, ingredient_formset=ingredient_formset)
+        return await _render_recipe_form(
+            request,
+            form=form,
+            ingredient_formset=ingredient_formset,
+            action_url=reverse("recipe_create"),
+            cancel_url=reverse("recipe_list"),
+        )
 
     async def post(self, request: HttpRequest) -> HttpResponse:
         form, ingredient_formset = _build_recipe_forms(request)
 
-        if form.is_valid() and ingredient_formset.is_valid():
+        is_form_valid = await sync_to_async(form.is_valid)()
+        is_formset_valid = await sync_to_async(ingredient_formset.is_valid)()
+
+        if is_form_valid and is_formset_valid:
             saved_recipe = await sync_to_async(form.save)()
             ingredient_formset.instance = saved_recipe
             await sync_to_async(ingredient_formset.save)()
             return redirect("recipe_detail", recipe_id=saved_recipe.pk)
 
-        return _render_recipe_form(request, form=form, ingredient_formset=ingredient_formset, status=400)
+        return await _render_recipe_form(
+            request,
+            form=form,
+            ingredient_formset=ingredient_formset,
+            status=400,
+            action_url=reverse("recipe_create"),
+            cancel_url=reverse("recipe_list"),
+        )
 
 
 class RecipeDetailView(View):
@@ -101,25 +125,47 @@ class RecipeDetailView(View):
 
         recipe: Recipe = await aget_object_or_404(Recipe, id=recipe_id)
         await recipe.adelete()
-        return redirect("recipe_list")
+        response = redirect("recipe_list")
+        response.status_code = 303
+        return response
 
 
 class RecipeChangeView(View):
     async def get(self, request: HttpRequest, recipe_id: int) -> HttpResponse:
         recipe: Recipe = await aget_object_or_404(Recipe, id=recipe_id)
         form, ingredient_formset = _build_recipe_forms(request, recipe)
-        return _render_recipe_form(request, recipe, form, ingredient_formset)
+        return await _render_recipe_form(
+            request,
+            form=form,
+            ingredient_formset=ingredient_formset,
+            recipe=recipe,
+            action_url=reverse("recipe_change", kwargs={"recipe_id": recipe_id}),
+            cancel_url=reverse("recipe_detail", kwargs={"recipe_id": recipe_id}),
+        )
 
     async def post(self, request: HttpRequest, recipe_id: int) -> HttpResponse:
         recipe: Recipe = await aget_object_or_404(Recipe, id=recipe_id)
         form, ingredient_formset = _build_recipe_forms(request, recipe)
 
-        if form.is_valid() and ingredient_formset.is_valid():
-            await form.asave()
-            await sync_to_async(ingredient_formset.save)()
-            return redirect("recipe_detail", recipe_id=recipe.id)
+        is_form_valid = await sync_to_async(form.is_valid)()
+        is_formset_valid = await sync_to_async(ingredient_formset.is_valid)()
 
-        return _render_recipe_form(request, recipe, form, ingredient_formset, status=400)
+        if is_form_valid and is_formset_valid:
+            await sync_to_async(form.save)()
+            await sync_to_async(ingredient_formset.save)()
+            response = redirect("recipe_detail", recipe_id=recipe.id)
+            response.status_code = 303
+            return response
+
+        return await _render_recipe_form(
+            request,
+            form=form,
+            ingredient_formset=ingredient_formset,
+            recipe=recipe,
+            status=400,
+            action_url=reverse("recipe_change", kwargs={"recipe_id": recipe_id}),
+            cancel_url=reverse("recipe_detail", kwargs={"recipe_id": recipe_id}),
+        )
 
 
 @datastar_response

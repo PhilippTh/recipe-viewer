@@ -2,7 +2,7 @@
 {% load i18n %}
 
 {% block content %}
-<form method="post" enctype="multipart/form-data" class="bg-white rounded-lg shadow-lg" id="recipe-form">
+<form method="post" action="{{ form_action }}" enctype="multipart/form-data" class="bg-white rounded-lg shadow-lg" id="recipe-form">
     {% csrf_token %}
     <input type="hidden" name="recipe_id" value="{{ recipe.pk|default_if_none:'' }}">
 
@@ -27,7 +27,7 @@
                 </svg>
             </button>
             <a 
-                href="{% url 'recipe_list' %}"
+                href="{{ cancel_url }}"
                 class="px-3 py-2 bg-red-600 text-white text-sm font-medium rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-colors"
                 title="{% trans 'Cancel' %}"
             >
