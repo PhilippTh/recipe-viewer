@@ -63,7 +63,9 @@ async def _render_recipe_form(
 async def recipe_list(request: HttpRequest) -> HttpResponse:
     """Display list of all recipes"""
     recipes: list[Recipe] = [recipe async for recipe in Recipe.objects.all().order_by("-created_at")]
-    return render(request, "recipes/recipe_list.html", {"recipes": recipes})
+    user = await request.auser()
+    can_add = await user.ahas_perm("recipes.add_recipe")
+    return render(request, "recipes/recipe_list.html", {"recipes": recipes, "can_add": can_add})
 
 
 class RecipeCreateView(View):

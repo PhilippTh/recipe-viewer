@@ -12,8 +12,24 @@
 <body class="bg-gray-100 min-h-screen">
     
     <div class="container mx-auto p-4 max-w-7xl">
-        <!-- Language Switcher -->
-        <div class="flex justify-end mb-4">
+        <!-- Top Bar -->
+        <div class="flex items-center justify-between mb-4">
+            {% if request.resolver_match and request.resolver_match.url_name != 'recipe_list' %}
+                <a
+                    href="{% url 'recipe_list' %}"
+                    onclick="if (window.history.length > 1) { window.history.back(); return false; }"
+                    class="inline-flex items-center gap-2 text-base font-medium text-slate-700 hover:text-slate-900"
+                    title="{% trans 'Back' %}"
+                >
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                    </svg>
+                    <span class="hidden sm:inline">{% trans "Back" %}</span>
+                </a>
+            {% else %}
+                <span class="w-5 h-5"></span>
+            {% endif %}
+
             <form action="{% url 'set_language' %}" method="post" id="language-form" class="flex items-center gap-2">
                 {% csrf_token %}
                 <input type="hidden" name="next" value="{{ request.path }}">
