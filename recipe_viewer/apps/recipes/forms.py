@@ -19,7 +19,7 @@ class RecipeForm(forms.ModelForm):
                 attrs={
                     "class": (
                         "text-2xl font-bold text-slate-800 bg-transparent border-none "
-                        "focus:outline-none focus:ring-0 mb-1 p-0"
+                        "focus:outline-none focus:ring-0 mb-1"
                     ),
                     "placeholder": _("Recipe name..."),
                 }

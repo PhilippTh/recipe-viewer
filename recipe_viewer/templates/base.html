@@ -16,7 +16,6 @@
             {% if request.resolver_match and request.resolver_match.url_name != 'recipe_list' %}
                 <a
                     href="{% url 'recipe_list' %}"
-                    onclick="if (window.history.length > 1) { window.history.back(); return false; }"
                     class="inline-flex items-center gap-2 text-base font-medium text-slate-700 hover:text-slate-900"
                     title="{% trans 'Back' %}"
                 >
