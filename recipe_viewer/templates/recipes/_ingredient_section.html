@@ -1,6 +1,6 @@
 {% load i18n %}
 <div id="ingredients-section" >
-    <div class="flex justify-between items-center mb-3">
+    <div class="flex justify-between items-center mb-2">
         <h2 class="text-xl font-bold text-slate-800 mb-0">{% trans "Ingredients" %}</h2>
         <button
             type="button"
@@ -16,6 +16,9 @@
             </svg>
         </button>
     </div>
+    <p class="text-sm text-gray-400 mb-3">
+        {% trans "List the amounts for a single portion. They can be scaled automatically when the recipe is viewed." %}
+    </p>
     <div class="bg-gray-50 rounded-lg p-3">
         <div id="ingredient-management">
             {% for hidden_field in ingredient_formset.management_form %}
