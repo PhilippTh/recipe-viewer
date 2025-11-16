@@ -92,7 +92,7 @@ IngredientFormSet = inlineformset_factory(
     Recipe,
     Ingredient,
     form=IngredientForm,
-    extra=3,  # Number of empty forms to display
+    extra=0,  # Number of additional empty forms to display
     can_delete=True,
     min_num=1,  # Require at least one ingredient
     validate_min=True,
