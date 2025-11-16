@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import cast
+
 from asgiref.sync import sync_to_async
 from django.contrib.auth.views import LoginView
 from django.contrib.auth.views import LogoutView
@@ -33,7 +35,7 @@ class AsyncLoginView(AsyncCompatViewMixin, LoginView):
 
 
 class AsyncLogoutView(AsyncCompatViewMixin, LogoutView):
-    next_page = reverse_lazy("recipe_list")
+    next_page: str | None = cast(str, reverse_lazy("recipe_list"))
 
 
 @require_http_methods(["POST"])

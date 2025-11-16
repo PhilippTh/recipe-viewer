@@ -1,6 +1,7 @@
 import math
 from collections.abc import AsyncGenerator
 from typing import Any
+from typing import cast
 
 from asgiref.sync import sync_to_async
 from datastar_py.consts import ElementPatchMode
@@ -8,6 +9,7 @@ from datastar_py.django import DatastarResponse
 from datastar_py.django import ServerSentEventGenerator
 from datastar_py.django import datastar_response
 from datastar_py.django import read_signals
+from django.forms.models import BaseInlineFormSet
 from django.http import HttpRequest
 from django.http import HttpResponse
 from django.http import HttpResponseBadRequest
@@ -25,12 +27,16 @@ from recipe_viewer.apps.recipes.models import Ingredient
 from recipe_viewer.apps.recipes.models import Recipe
 
 
-def _build_recipe_forms(request: HttpRequest, recipe: Recipe | None = None) -> tuple[RecipeForm, IngredientFormSet]:
+def _build_recipe_forms(request: HttpRequest, recipe: Recipe | None = None) -> tuple[RecipeForm, BaseInlineFormSet]:
     data = request.POST or None
     files = request.FILES or None
     form = RecipeForm(data=data, files=files, instance=recipe)
     formset_instance = recipe or Recipe()
-    ingredient_formset = IngredientFormSet(data=data, files=files, instance=formset_instance)
+    ingredient_formset: BaseInlineFormSet = IngredientFormSet(
+        data=data,
+        files=files,
+        instance=formset_instance,
+    )
     return form, ingredient_formset
 
 
@@ -62,7 +68,7 @@ def _normalize_portions(signals: dict[str, Any] | None) -> float:
 async def _render_recipe_form(
     request: HttpRequest,
     form: RecipeForm,
-    ingredient_formset: IngredientFormSet,
+    ingredient_formset: BaseInlineFormSet,
     recipe: Recipe | None = None,
     status: int = 200,
     action_url: str | None = None,
@@ -266,7 +272,7 @@ async def add_ingredient_form(request: HttpRequest) -> HttpResponse:
         return HttpResponseBadRequest("Unknown form action.")
 
     formset_instance = recipe if recipe is not None else Recipe()
-    ingredient_formset = await sync_to_async(
+    ingredient_formset: BaseInlineFormSet = await sync_to_async(
         lambda: IngredientFormSet(
             data=data,
             files=request.FILES,
@@ -284,10 +290,11 @@ async def add_ingredient_form(request: HttpRequest) -> HttpResponse:
         request=request,
     )
 
-    return DatastarResponse(
+    response = DatastarResponse(
         ServerSentEventGenerator.patch_elements(
             rendered_section,
             selector="#ingredients-section",
             mode=ElementPatchMode.REPLACE,
         )
     )
+    return cast(HttpResponse, response)

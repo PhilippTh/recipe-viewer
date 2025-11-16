@@ -1,31 +1,47 @@
-from django.contrib.auth.base_user import BaseUserManager
+from __future__ import annotations
+
+from typing import Any
+from typing import ClassVar
+from typing import cast
+
 from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import UserManager as DjangoUserManager
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 
-class UserManager(BaseUserManager):
+class UserManager(DjangoUserManager["User"]):
     """Custom manager that authenticates users via their email address."""
 
     use_in_migrations = True
 
-    def _create_user(self, email: str | None, password: str | None, **extra_fields):
+    def _create_user(self, email: str | None, password: str | None, **extra_fields: Any) -> User:
         if not email:
             msg = _("The given email must be set.")
             raise ValueError(msg)
 
         email = self.normalize_email(email)
-        user = self.model(email=email, **extra_fields)
+        user = cast("User", self.model(email=email, **extra_fields))
         user.set_password(password)
         user.save(using=self._db)
         return user
 
-    def create_user(self, email: str | None, password: str | None = None, **extra_fields):
+    def create_user(  # type: ignore[override]
+        self,
+        email: str,
+        password: str,
+        **extra_fields: Any,
+    ) -> User:
         extra_fields.setdefault("is_staff", False)
         extra_fields.setdefault("is_superuser", False)
         return self._create_user(email, password, **extra_fields)
 
-    def create_superuser(self, email: str | None, password: str | None, **extra_fields):
+    def create_superuser(  # type: ignore[override]
+        self,
+        email: str,
+        password: str,
+        **extra_fields: Any,
+    ) -> User:
         extra_fields.setdefault("is_staff", True)
         extra_fields.setdefault("is_superuser", True)
 
@@ -40,13 +56,13 @@ class UserManager(BaseUserManager):
 class User(AbstractUser):
     """Email-first user model that removes the username field."""
 
-    username = None
+    username = None  # type: ignore[assignment]
     email = models.EmailField(_("email address"), unique=True)
 
-    USERNAME_FIELD = "email"
-    REQUIRED_FIELDS: list[str] = []
+    USERNAME_FIELD = "email"  # type: ignore[misc]
+    REQUIRED_FIELDS: ClassVar[list[str]] = []
 
-    objects = UserManager()
+    objects: ClassVar[UserManager] = UserManager()
 
     def __str__(self) -> str:
         return self.email
