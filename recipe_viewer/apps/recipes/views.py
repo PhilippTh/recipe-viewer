@@ -7,7 +7,6 @@ from datastar_py.django import DatastarResponse
 from datastar_py.django import ServerSentEventGenerator
 from datastar_py.django import datastar_response
 from datastar_py.django import read_signals
-from django.conf import settings
 from django.http import HttpRequest
 from django.http import HttpResponse
 from django.http import HttpResponseBadRequest
@@ -16,7 +15,6 @@ from django.shortcuts import redirect
 from django.shortcuts import render
 from django.template.loader import render_to_string
 from django.urls import reverse
-from django.utils import translation
 from django.views import View
 from django.views.decorators.http import require_http_methods
 
@@ -65,7 +63,7 @@ async def recipe_list(request: HttpRequest) -> HttpResponse:
     recipes: list[Recipe] = [recipe async for recipe in Recipe.objects.all().order_by("-created_at")]
     user = await request.auser()
     can_add = await user.ahas_perm("recipes.add_recipe")
-    return render(request, "recipes/recipe_list.html", {"recipes": recipes, "can_add": can_add})
+    return render(request, "recipes/recipe_list.html", {"recipes": recipes, "user": user, "can_add": can_add})
 
 
 class RecipeCreateView(View):
@@ -116,7 +114,7 @@ class RecipeDetailView(View):
         return render(
             request,
             "recipes/recipe_detail.html",
-            {"recipe": recipe, "ingredients": ingredients, "can_change": can_change, "can_delete": can_delete},
+            {"recipe": recipe, "ingredients": ingredients, "can_change": can_change, "can_delete": can_delete, "user": user},
         )
 
     async def delete(self, request: HttpRequest, recipe_id: int) -> HttpResponse:
@@ -261,38 +259,3 @@ async def add_ingredient_form(request: HttpRequest) -> HttpResponse:
             mode=ElementPatchMode.REPLACE,
         )
     )
-
-
-@require_http_methods(["POST"])
-async def set_language(request: HttpRequest) -> HttpResponse:
-    """
-    Set user's preferred language.
-    This is a synchronous view as it works with cookies and sessions.
-    """
-    language_code = request.POST.get("language", request.GET.get("language", settings.LANGUAGE_CODE))
-
-    # Validate language code
-    if language_code not in [lang[0] for lang in settings.LANGUAGES]:
-        language_code = settings.LANGUAGE_CODE
-
-    # Activate the language for the current thread
-    translation.activate(language_code)
-
-    # Get the redirect URL (either from POST/GET or fallback to referer or home)
-    next_url = request.POST.get("next", request.GET.get("next", request.META.get("HTTP_REFERER", "/")))
-
-    response = redirect(next_url)
-
-    # Set the language cookie so it persists across requests
-    response.set_cookie(
-        settings.LANGUAGE_COOKIE_NAME,
-        language_code,
-        max_age=settings.LANGUAGE_COOKIE_AGE if hasattr(settings, "LANGUAGE_COOKIE_AGE") else 31536000,  # 1 year
-        path=settings.LANGUAGE_COOKIE_PATH if hasattr(settings, "LANGUAGE_COOKIE_PATH") else "/",
-        domain=settings.LANGUAGE_COOKIE_DOMAIN if hasattr(settings, "LANGUAGE_COOKIE_DOMAIN") else None,
-        secure=settings.LANGUAGE_COOKIE_SECURE if hasattr(settings, "LANGUAGE_COOKIE_SECURE") else False,
-        httponly=settings.LANGUAGE_COOKIE_HTTPONLY if hasattr(settings, "LANGUAGE_COOKIE_HTTPONLY") else False,
-        samesite=settings.LANGUAGE_COOKIE_SAMESITE if hasattr(settings, "LANGUAGE_COOKIE_SAMESITE") else None,
-    )
-
-    return response

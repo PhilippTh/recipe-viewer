@@ -30,7 +30,7 @@
                 <span class="w-5 h-5"></span>
             {% endif %}
 
-            <form action="{% url 'set_language' %}" method="post" id="language-form" class="flex items-center gap-2">
+            <form action="{% url 'accounts:set_language' %}" method="post" id="language-form" class="flex items-center gap-2">
                 {% csrf_token %}
                 <input type="hidden" name="next" value="{{ request.path }}">
                 {% get_current_language as LANGUAGE_CODE %}
@@ -51,6 +51,29 @@
                     {% endfor %}
                 </select>
             </form>
+            <div class="flex items-center gap-2">
+                {% if user.is_authenticated %}
+                    <span class="text-sm text-slate-600 hidden sm:inline">
+                        {% trans "Hello" %}, {{ user.email }}
+                    </span>
+                    <form method="post" action="{% url 'accounts:logout' %}">
+                        {% csrf_token %}
+                        <button
+                            type="submit"
+                            class="inline-flex items-center rounded-md border border-slate-200 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50"
+                        >
+                            {% trans "Log out" %}
+                        </button>
+                    </form>
+                {% else %}
+                    <a
+                        href="{% url 'accounts:login' %}?next={{ request.get_full_path|urlencode }}"
+                        class="inline-flex items-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500"
+                    >
+                        {% trans "Log in" %}
+                    </a>
+                {% endif %}
+            </div>
         </div>
         {% block content %}{% endblock %}
     </div>

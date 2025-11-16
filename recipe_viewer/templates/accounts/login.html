@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Sign in" %} - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="max-w-md mx-auto bg-white shadow rounded-lg p-8">
+    <h1 class="text-2xl font-semibold text-slate-900 mb-6 text-center">{% trans "Welcome back" %}</h1>
+
+    {% if form.non_field_errors %}
+        <div class="mb-4 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+            {% for error in form.non_field_errors %}
+                <p>{{ error }}</p>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <form method="post" class="space-y-5">
+        {% csrf_token %}
+        {% if next %}
+            <input type="hidden" name="{{ redirect_field_name }}" value="{{ next }}">
+        {% endif %}
+
+        <div>
+            <label for="{{ form.username.id_for_label }}" class="block text-sm font-medium text-slate-700 mb-1">
+                {{ form.username.label }}
+            </label>
+            {{ form.username }}
+            {% if form.username.errors %}
+                <p class="mt-1 text-sm text-red-600">
+                    {{ form.username.errors|join:", " }}
+                </p>
+            {% endif %}
+        </div>
+
+        <div>
+            <label for="{{ form.password.id_for_label }}" class="block text-sm font-medium text-slate-700 mb-1">
+                {{ form.password.label }}
+            </label>
+            {{ form.password }}
+            {% if form.password.errors %}
+                <p class="mt-1 text-sm text-red-600">
+                    {{ form.password.errors|join:", " }}
+                </p>
+            {% endif %}
+        </div>
+
+        <button type="submit" class="w-full inline-flex justify-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow hover:bg-indigo-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-indigo-500">
+            {% trans "Sign in" %}
+        </button>
+    </form>
+</div>
+{% endblock %}
+
