@@ -1,25 +1,11 @@
 {% load i18n %}
 <div id="ingredients-section" >
-    <div class="flex justify-between items-center mb-2">
-        <h2 class="text-xl font-bold text-slate-800 mb-0">{% trans "Ingredients" %}</h2>
-        <button
-            type="button"
-            name="form_action"
-            value="add_ingredient"
-            formnovalidate
-            class="px-3 py-1 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
-            title="{% trans 'Add Ingredient' %}"
-            data-on:click="@post('{% url 'add_ingredient_form' %}', { contentType: 'form', selector: '#recipe-form', headers: {'X-CSRFToken': '{{ csrf_token }}'} })"
-        >
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-            </svg>
-        </button>
-    </div>
-    <p class="text-sm text-gray-400 mb-3">
-        {% trans "List the amounts for a single portion. They can be scaled automatically when the recipe is viewed." %}
-    </p>
+    <h2 class="text-xl font-bold text-slate-800 mb-2">{% trans "Ingredients" %}</h2>
+
     <div class="bg-gray-50 rounded-lg p-3">
+        <p class="text-sm text-gray-400 mb-3">
+            {% trans "List the amounts for a single portion. They can be scaled automatically when the recipe is viewed." %}
+        </p>
         <div id="ingredient-management">
             {% for hidden_field in ingredient_formset.management_form %}
                 {{ hidden_field }}
@@ -79,6 +65,24 @@
                     </div>
                 </div>
             {% endfor %}
+        </div>
+        <div class="mt-2">
+            <button
+                type="button"
+                name="form_action"
+                value="add_ingredient"
+                formnovalidate
+                class="w-full border-2 border-dashed border-blue-200 text-blue-600 text-sm font-medium py-1 rounded-md hover:bg-blue-50 hover:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
+                title="{% trans 'Add Ingredient' %}"
+                data-on:click="@post('{% url 'add_ingredient_form' %}', { contentType: 'form', selector: '#recipe-form', headers: {'X-CSRFToken': '{{ csrf_token }}'} })"
+            >
+                <span class="inline-flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                    </svg>
+                    {% trans "Add another ingredient" %}
+                </span>
+            </button>
         </div>
 
         {% if ingredient_formset.non_form_errors %}
