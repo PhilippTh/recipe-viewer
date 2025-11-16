@@ -33,6 +33,17 @@ def _build_recipe_forms(request: HttpRequest, recipe: Recipe | None = None) -> t
     return form, ingredient_formset
 
 
+async def _user_has_any_permission(request: HttpRequest, *permissions: str) -> bool:
+    user = await request.auser()
+    is_authenticated = bool(getattr(user, "is_authenticated", False))
+    if not is_authenticated:
+        return False
+    for permission in permissions:
+        if await user.ahas_perm(permission):
+            return True
+    return False
+
+
 async def _render_recipe_form(
     request: HttpRequest,
     form: RecipeForm,
@@ -70,6 +81,8 @@ class RecipeCreateView(View):
     """Shared logic for creating and editing recipes with their ingredients."""
 
     async def get(self, request: HttpRequest) -> HttpResponse:
+        if not await _user_has_any_permission(request, "recipes.add_recipe"):
+            return HttpResponse(status=403)
         form, ingredient_formset = _build_recipe_forms(request)
         return await _render_recipe_form(
             request,
@@ -80,6 +93,8 @@ class RecipeCreateView(View):
         )
 
     async def post(self, request: HttpRequest) -> HttpResponse:
+        if not await _user_has_any_permission(request, "recipes.add_recipe"):
+            return HttpResponse(status=403)
         form, ingredient_formset = _build_recipe_forms(request)
 
         is_form_valid = await sync_to_async(form.is_valid)()
@@ -119,10 +134,8 @@ class RecipeDetailView(View):
 
     async def delete(self, request: HttpRequest, recipe_id: int) -> HttpResponse:
         """Delete recipe"""
-        # Check permission
-        user = await request.auser()
-        if not await user.ahas_perm("recipes.delete_recipe"):
-            return HttpResponse("Permission denied", status=403)
+        if not await _user_has_any_permission(request, "recipes.delete_recipe"):
+            return HttpResponse(status=403)
 
         recipe: Recipe = await aget_object_or_404(Recipe, id=recipe_id)
         await recipe.adelete()
@@ -133,6 +146,8 @@ class RecipeDetailView(View):
 
 class RecipeChangeView(View):
     async def get(self, request: HttpRequest, recipe_id: int) -> HttpResponse:
+        if not await _user_has_any_permission(request, "recipes.change_recipe"):
+            return HttpResponse(status=403)
         recipe: Recipe = await aget_object_or_404(Recipe, id=recipe_id)
         form, ingredient_formset = _build_recipe_forms(request, recipe)
         return await _render_recipe_form(
@@ -145,6 +160,8 @@ class RecipeChangeView(View):
         )
 
     async def post(self, request: HttpRequest, recipe_id: int) -> HttpResponse:
+        if not await _user_has_any_permission(request, "recipes.change_recipe"):
+            return HttpResponse(status=403)
         recipe: Recipe = await aget_object_or_404(Recipe, id=recipe_id)
         form, ingredient_formset = _build_recipe_forms(request, recipe)
 
@@ -200,6 +217,8 @@ def _extract_formset_prefix(data: dict[str, Any]) -> str | None:
 @require_http_methods(["POST"])
 async def add_ingredient_form(request: HttpRequest) -> HttpResponse:
     """Morph the entire ingredient section after add/remove actions."""
+    if not await _user_has_any_permission(request, "recipes.add_recipe", "recipes.change_recipe"):
+        return HttpResponse(status=403)
     data = request.POST.copy()
     action = data.get("form_action")
     if not action:
