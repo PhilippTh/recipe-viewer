@@ -13,4 +13,3 @@ urlpatterns = [
     path("<int:recipe_id>/change/", RecipeChangeView.as_view(), name="recipe_change"),
     path("<int:recipe_id>/ingredients/", recipe_ingredients, name="recipe_ingredients"),
 ]
-

@@ -26,10 +26,10 @@ from recipe_viewer.apps.recipes.models import Recipe
 
 
 def _build_recipe_forms(request: HttpRequest, recipe: Recipe | None = None) -> tuple[RecipeForm, IngredientFormSet]:
-    data = request.POST if request.method == "POST" else None
-    files = request.FILES if request.method == "POST" else None
+    data = request.POST or None
+    files = request.FILES or None
     form = RecipeForm(data=data, files=files, instance=recipe)
-    formset_instance = recipe if recipe is not None else Recipe()
+    formset_instance = recipe or Recipe()
     ingredient_formset = IngredientFormSet(data=data, files=files, instance=formset_instance)
     return form, ingredient_formset
 
@@ -95,7 +95,7 @@ async def recipe_list(request: HttpRequest) -> HttpResponse:
 
 
 class RecipeCreateView(View):
-    """Shared logic for creating and editing recipes with their ingredients."""
+    """Shared logic for creating recipes with their ingredients."""
 
     async def get(self, request: HttpRequest) -> HttpResponse:
         if not await _user_has_any_permission(request, "recipes.add_recipe"):
@@ -158,6 +158,8 @@ class RecipeDetailView(View):
 
 
 class RecipeChangeView(View):
+    """Shared logic for editing recipes with their ingredients."""
+
     async def get(self, request: HttpRequest, recipe_id: int) -> HttpResponse:
         if not await _user_has_any_permission(request, "recipes.change_recipe"):
             return HttpResponse(status=403)

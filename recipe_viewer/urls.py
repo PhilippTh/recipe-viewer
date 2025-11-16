@@ -21,7 +21,6 @@ from django.contrib import admin
 from django.urls import include
 from django.urls import path
 
-
 from recipe_viewer.apps.recipes.views import recipe_list
 
 urlpatterns = [
