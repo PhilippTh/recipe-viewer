@@ -1,3 +1,4 @@
+import math
 from collections.abc import AsyncGenerator
 from typing import Any
 
@@ -44,6 +45,20 @@ async def _user_has_any_permission(request: HttpRequest, *permissions: str) -> b
     return False
 
 
+def _normalize_portions(signals: dict[str, Any] | None) -> float:
+    """Ensure the portions multiplier is a positive, finite float."""
+    if not signals:
+        return 1.0
+    raw_value = signals.get("portions", 1.0)
+    try:
+        portions = float(raw_value)
+    except (TypeError, ValueError):
+        return 1.0
+    if not math.isfinite(portions):
+        return 1.0
+    return max(portions, 0.5)
+
+
 async def _render_recipe_form(
     request: HttpRequest,
     form: RecipeForm,
@@ -72,9 +87,11 @@ async def _render_recipe_form(
 async def recipe_list(request: HttpRequest) -> HttpResponse:
     """Display list of all recipes"""
     recipes: list[Recipe] = [recipe async for recipe in Recipe.objects.all().order_by("-created_at")]
-    user = await request.auser()
-    can_add = await user.ahas_perm("recipes.add_recipe")
-    return render(request, "recipes/recipe_list.html", {"recipes": recipes, "user": user, "can_add": can_add})
+    return await sync_to_async(render)(
+        request=request,
+        template_name="recipes/recipe_list.html",
+        context={"recipes": recipes},
+    )
 
 
 class RecipeCreateView(View):
@@ -122,14 +139,10 @@ class RecipeDetailView(View):
         recipe: Recipe = await aget_object_or_404(Recipe, id=recipe_id)
         ingredients: list[Ingredient] = [ingredient async for ingredient in recipe.ingredients.all()]
 
-        user = await request.auser()
-
-        can_change = await user.ahas_perm("recipes.change_recipe")
-        can_delete = await user.ahas_perm("recipes.delete_recipe")
-        return render(
-            request,
-            "recipes/recipe_detail.html",
-            {"recipe": recipe, "ingredients": ingredients, "can_change": can_change, "can_delete": can_delete, "user": user},
+        return await sync_to_async(render)(
+            request=request,
+            template_name="recipes/recipe_detail.html",
+            context={"recipe": recipe, "ingredients": ingredients},
         )
 
     async def delete(self, request: HttpRequest, recipe_id: int) -> HttpResponse:
@@ -193,13 +206,11 @@ async def recipe_ingredients(request: HttpRequest, recipe_id: int) -> AsyncGener
     recipe: Recipe = await aget_object_or_404(Recipe, id=recipe_id)
     ingredients: list[Ingredient] = [ingredient async for ingredient in recipe.ingredients.all()]
     signals: dict[str, Any] | None = read_signals(request)
-
-    if signals is None:
-        signals = {}
+    portions = _normalize_portions(signals)
 
     # Calculate quantities based on portions
     calculated_ingredients: list[dict[str, Any]] = [
-        {"name": ing.name, "quantity": ing.quantity * signals["portions"], "unit": ing.unit} for ing in ingredients
+        {"name": ing.name, "quantity": ing.quantity * portions, "unit": ing.unit} for ing in ingredients
     ]
 
     rendered_html: str = render_to_string("recipes/_ingredients.html", {"ingredients": calculated_ingredients})

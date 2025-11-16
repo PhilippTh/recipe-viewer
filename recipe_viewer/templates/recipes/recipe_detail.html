@@ -12,7 +12,7 @@
             <p class="text-xs text-gray-500">{% trans "Added" %} {{ recipe.created_at|date:"DATE_FORMAT" }} • {% trans "Updated" %} {{ recipe.updated_at|date:"DATE_FORMAT" }}</p>
         </div>
         <div class="flex gap-2">
-            {% if can_change %} 
+            {% if perms.recipes.change_recipe %} 
             <button 
                 data-on:click="@get('{% url 'recipe_change' recipe.id %}')"
                 class="px-3 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
@@ -23,7 +23,7 @@
                 </svg>
             </button>
             {% endif %}
-            {% if can_delete %}
+            {% if perms.recipes.delete_recipe %}
             <button 
                 data-on:click="if(confirm('{% trans "Are you sure you want to delete this recipe?" %}')) { @delete('{% url 'recipe_detail' recipe.id %}', {headers: {'X-CSRFToken': '{{ csrf_token }}'}}) }"
                 class="px-3 py-2 bg-red-600 text-white text-sm font-medium rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-colors"
