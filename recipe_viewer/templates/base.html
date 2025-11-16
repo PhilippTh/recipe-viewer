@@ -29,46 +29,48 @@
                 <span class="w-5 h-5"></span>
             {% endif %}
 
-            <form action="{% url 'accounts:set_language' %}" method="post" id="language-form" class="flex items-center gap-2">
-                {% csrf_token %}
-                <input type="hidden" name="next" value="{{ request.path }}">
-                {% get_current_language as LANGUAGE_CODE %}
-                {% get_available_languages as LANGUAGES %}
-                <!-- Translation Icon -->
-                <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"></path>
-                </svg>
-                <select 
-                    name="language" 
-                    onchange="document.getElementById('language-form').submit()"
-                    class="text-gray-700 bg-transparent cursor-pointer"
-                >
-                    {% for lang_code, lang_name in LANGUAGES %}
-                        <option value="{{ lang_code }}" {% if LANGUAGE_CODE == lang_code %}selected{% endif %}>
-                            {{ lang_name }}
-                        </option>
-                    {% endfor %}
-                </select>
-            </form>
             <div class="flex items-center gap-2">
-                {% if user.is_authenticated %}
-                    <form method="post" action="{% url 'accounts:logout' %}">
-                        {% csrf_token %}
-                        <button
-                            type="submit"
+                <form action="{% url 'accounts:set_language' %}" method="post" id="language-form" class="flex items-center gap-2">
+                    {% csrf_token %}
+                    <input type="hidden" name="next" value="{{ request.path }}">
+                    {% get_current_language as LANGUAGE_CODE %}
+                    {% get_available_languages as LANGUAGES %}
+                    <!-- Translation Icon -->
+                    <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"></path>
+                    </svg>
+                    <select 
+                        name="language" 
+                        onchange="document.getElementById('language-form').submit()"
+                        class="text-gray-700 bg-transparent cursor-pointer"
+                    >
+                        {% for lang_code, lang_name in LANGUAGES %}
+                            <option value="{{ lang_code }}" {% if LANGUAGE_CODE == lang_code %}selected{% endif %}>
+                                {{ lang_name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </form>
+                <div class="flex items-center gap-2">
+                    {% if user.is_authenticated %}
+                        <form method="post" action="{% url 'accounts:logout' %}">
+                            {% csrf_token %}
+                            <button
+                                type="submit"
+                                class="inline-flex items-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500"
+                            >
+                                {% trans "Log out" %}
+                            </button>
+                        </form>
+                    {% else %}
+                        <a
+                            href="{% url 'accounts:login' %}?next={{ request.get_full_path|urlencode }}"
                             class="inline-flex items-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500"
                         >
-                            {% trans "Log out" %}
-                        </button>
-                    </form>
-                {% else %}
-                    <a
-                        href="{% url 'accounts:login' %}?next={{ request.get_full_path|urlencode }}"
-                        class="inline-flex items-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500"
-                    >
-                        {% trans "Log in" %}
-                    </a>
-                {% endif %}
+                            {% trans "Log in" %}
+                        </a>
+                    {% endif %}
+                </div>
             </div>
         </div>
         {% block content %}{% endblock %}
