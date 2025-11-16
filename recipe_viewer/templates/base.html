@@ -29,7 +29,7 @@
                 <span class="w-5 h-5"></span>
             {% endif %}
 
-            <div class="flex items-center gap-2">
+            <div class="flex items-center gap-6">
                 <form action="{% url 'accounts:set_language' %}" method="post" id="language-form" class="flex items-center gap-2">
                     {% csrf_token %}
                     <input type="hidden" name="next" value="{{ request.path }}">
@@ -57,7 +57,7 @@
                             {% csrf_token %}
                             <button
                                 type="submit"
-                                class="inline-flex items-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500"
+                                class="text-gray-700 underline hover:no-underline"
                             >
                                 {% trans "Log out" %}
                             </button>
@@ -65,7 +65,7 @@
                     {% else %}
                         <a
                             href="{% url 'accounts:login' %}?next={{ request.get_full_path|urlencode }}"
-                            class="inline-flex items-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500"
+                            class="text-gray-700 underline hover:no-underline"
                         >
                             {% trans "Log in" %}
                         </a>
