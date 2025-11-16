@@ -118,6 +118,8 @@ uv run python manage.py compilemessages
 
 - [ ] Add docker compose with postgres for deployment
 - [ ] Add possibility to load initial recipes
-- [ ] Add proper views for adding and editing recipes (just possible in Django admin view)
+- [x] ~~Add proper views for adding and editing recipes (just possible in Django admin view)~~
+- [ ] Allow users to switch between tiles and table on the landing page
 - [ ] Add categories, tags, searching and filtering
+- [ ] Use compiled tailwind instead of default cdn
 - [ ] AI?
