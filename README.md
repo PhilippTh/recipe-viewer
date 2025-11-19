@@ -56,27 +56,36 @@ A clean, modern Django-based recipe viewing application with real-time ingredien
 
 ### Option 2: Local Development
 
-1. **Install dependencies** (using [uv](https://github.com/astral-sh/uv)):
+1. **Set up environment variables**:
+   ```bash
+   export SECRET_KEY="your-secret-key-here"
+   # Or create a .env file and source it:
+   # cp .env.example .env
+   # Edit .env with your values
+   # export $(cat .env | xargs)
+   ```
+
+2. **Install dependencies** (using [uv](https://github.com/astral-sh/uv)):
    ```bash
    uv sync
    ```
 
-2. **Run migrations**:
+3. **Run migrations**:
    ```bash
    uv run python manage.py migrate
    ```
 
-3. **Populate sample data** (optional):
+4. **Populate sample data** (optional):
    ```bash
    uv run python manage.py populate_recipes
    ```
 
-4. **Create admin user** (optional):
+5. **Create admin user** (optional):
    ```bash
    uv run python manage.py createsuperuser
    ```
 
-5. **Start the development server**:
+6. **Start the development server**:
    ```bash
    uv run python manage.py runserver
    ```

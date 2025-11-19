@@ -15,10 +15,10 @@ services:
       - ALLOWED_HOSTS=${ALLOWED_HOSTS}
       - DOCKER_ENV=true
       - PORT=${PORT:-8000}
+      - WORKERS=${WORKERS:-4}
       - LOG_LEVEL=${LOG_LEVEL:-info}
       - SKIP_MIGRATIONS=${SKIP_MIGRATIONS:-false}
       - SKIP_COLLECTSTATIC=${SKIP_COLLECTSTATIC:-false}
-      - SKIP_COMPILEMESSAGES=${SKIP_COMPILEMESSAGES:-false}
     networks:
       - recipe_network
 
