@@ -4,35 +4,48 @@
 {% block title %}{% trans "Recipes" %} - {% trans "Recipe Viewer" %}{% endblock %}
 
 {% block content %}
-<h1 class="text-4xl font-bold text-slate-800 mb-2">{% trans "All Recipes" %}</h1>
-<p class="text-gray-600 mb-6">
-    {% blocktrans count counter=recipes|length %}
-        {{ counter }} recipe
-    {% plural %}
-        {{ counter }} recipes
-    {% endblocktrans %}
-</p>
+<div class="bg-white rounded-lg shadow-lg px-6 py-4">
+    <div class="flex justify-between items-center mb-4">
+        <div>
+            <h1 class="text-4xl font-bold text-slate-800 mb-2">{% trans "All Recipes" %}</h1>
+            <p class="text-gray-600">
+                {% blocktrans count counter=recipes|length %}
+                    {{ counter }} recipe
+                {% plural %}
+                    {{ counter }} recipes
+                {% endblocktrans %}
+            </p>
+        </div>
+        {% if perms.recipes.add_recipe %}
+            <a href="{% url 'recipe_create' %}" class="self-baseline p-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all shadow-sm hover:shadow flex items-center" title="{% trans 'Create Recipe' %}">
+                <svg class="size-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                </svg>
+            </a>
+        {% endif %}
+    </div>
 
-{% if recipes %}
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
-        {% for recipe in recipes %}
-        <a href="{% url 'recipe_detail' recipe.id %}" class="group block">
-            <div class="bg-white border border-gray-200 rounded-lg p-5 transition-all duration-200 hover:-translate-y-1 hover:shadow-xl cursor-pointer">
-                {% if recipe.image %}
-                    <img src="{{ recipe.image.url }}" alt="{{ recipe.name }}" class="w-full h-48 object-cover rounded-md mb-4">
-                {% else %}
-                    <div class="w-full h-48 bg-gray-200 rounded-md mb-4"></div>
-                {% endif %}
-                <h2 class="text-xl font-semibold text-slate-800 mb-2 group-hover:text-blue-600 transition-colors">{{ recipe.name }}</h2>
-                <p class="text-sm text-gray-500">{% trans "Added" %} {{ recipe.created_at|date:"DATE_FORMAT" }}</p>
-            </div>
-        </a>
-        {% endfor %}
-    </div>
-{% else %}
-    <div class="text-center text-gray-500 py-16">
-        <p class="text-lg">{% trans "No recipes yet. Add some recipes in the admin panel!" %}</p>
-    </div>
-{% endif %}
+    {% if recipes %}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
+            {% for recipe in recipes %}
+            <a href="{% url 'recipe_detail' recipe.id %}" class="group block">
+                <div class="bg-white border border-gray-200 rounded-lg p-5 transition-all duration-200 hover:-translate-y-1 hover:shadow-xl cursor-pointer">
+                    {% if recipe.image %}
+                        <img src="{{ recipe.image.url }}" alt="{{ recipe.name }}" class="w-full h-48 object-cover rounded-md mb-4">
+                    {% else %}
+                        <div class="w-full h-48 bg-gray-200 rounded-md mb-4"></div>
+                    {% endif %}
+                    <h2 class="text-xl font-semibold text-slate-800 mb-2 group-hover:text-blue-600 transition-colors">{{ recipe.name }}</h2>
+                    <p class="text-sm text-gray-500">{% trans "Added" %} {{ recipe.created_at|date:"DATE_FORMAT" }}</p>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="text-center text-gray-500 py-16">
+            <p class="text-lg">{% trans "No recipes yet. Add some recipes in the admin panel!" %}</p>
+        </div>
+    {% endif %}
+</div>
 {% endblock %}
 

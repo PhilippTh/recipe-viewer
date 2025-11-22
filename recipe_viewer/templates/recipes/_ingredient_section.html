@@ -1,0 +1,92 @@
+{% load i18n %}
+<div id="ingredients-section" >
+    <h2 class="text-xl font-bold text-slate-800 mb-2">{% trans "Ingredients" %}</h2>
+
+    <div class="bg-gray-50 rounded-lg p-3">
+        <p class="text-sm text-gray-400 mb-3">
+            {% trans "List the amounts for a single portion. They can be scaled automatically when the recipe is viewed." %}
+        </p>
+        <div id="ingredient-management">
+            {% for hidden_field in ingredient_formset.management_form %}
+                {{ hidden_field }}
+            {% endfor %}
+        </div>
+
+        <div id="ingredients-list" class="space-y-2">
+            {% for ingredient_form in ingredient_formset %}
+                <div class="ingredient-form-item{% if ingredient_form.DELETE.value %} hidden{% endif %}" data-ingredient-form>
+                    <div class="hidden">
+                        {% if ingredient_form.id %}
+                            {{ ingredient_form.id }}
+                        {% endif %}
+                        {% if ingredient_form.DELETE %}
+                            {{ ingredient_form.DELETE.as_hidden }}
+                        {% endif %}
+                    </div>
+                    <div class="grid grid-cols-12 gap-2 items-center">
+                        <div class="col-span-3">
+                            {{ ingredient_form.quantity }}
+                            {% if ingredient_form.quantity.errors %}
+                                <div class="text-red-600 text-xs mt-1">{{ ingredient_form.quantity.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-span-3">
+                            {{ ingredient_form.unit }}
+                            {% if ingredient_form.unit.errors %}
+                                <div class="text-red-600 text-xs mt-1">{{ ingredient_form.unit.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-span-5">
+                            {{ ingredient_form.name }}
+                            {% if ingredient_form.name.errors %}
+                                <div class="text-red-600 text-xs mt-1">{{ ingredient_form.name.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-span-1 flex items-center justify-center">
+                            <button 
+                                type="button"
+                                name="form_action"
+                                value="remove:{{ ingredient_form.prefix }}"
+                                formnovalidate
+                                class="text-red-600 hover:text-red-800 cursor-pointer"
+                                title="{% trans 'Remove' %}"
+                                data-on:click="@post('{% url 'add_ingredient_form' %}', { contentType: 'form', selector: '#recipe-form', headers: {'X-CSRFToken': '{{ csrf_token }}'} })"
+                            >
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                </svg>
+                            </button>
+                        </div>
+                        {% if ingredient_form.non_field_errors %}
+                            <div class="col-span-12 text-red-600 text-xs mt-1">
+                                {{ ingredient_form.non_field_errors }}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        {% if ingredient_formset.non_form_errors %}
+            <div class="text-red-600 text-sm mt-2">{{ ingredient_formset.non_form_errors }}</div>
+        {% endif %}
+        <div class="mt-2">
+            <button
+                type="button"
+                name="form_action"
+                value="add_ingredient"
+                formnovalidate
+                class="w-full border-2 border-dashed border-blue-200 text-blue-600 text-sm font-medium py-1 rounded-md hover:bg-blue-50 hover:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
+                title="{% trans 'Add Ingredient' %}"
+                data-on:click="@post('{% url 'add_ingredient_form' %}', { contentType: 'form', selector: '#recipe-form', headers: {'X-CSRFToken': '{{ csrf_token }}'} })"
+            >
+                <span class="inline-flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                    </svg>
+                    {% trans "Add another ingredient" %}
+                </span>
+            </button>
+        </div>
+    </div>
+</div>
+

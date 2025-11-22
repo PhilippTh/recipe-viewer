@@ -36,3 +36,9 @@ help:
 	@echo "  make docker-logs    - Show and follow container logs"
 	@echo "  make docker-restart - Restart all containers"
 	@echo "  make docker-clean   - Remove containers, volumes and clean up"
+
+get-translations:
+	uv run manage.py makemessages -a
+
+compile-translations:
+	uv run manage.py compilemessages

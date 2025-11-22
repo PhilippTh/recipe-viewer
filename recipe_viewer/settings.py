@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "recipe_viewer.apps.accounts",
     "recipe_viewer.apps.recipes",
 ]
 
@@ -143,3 +144,9 @@ MEDIA_ROOT = BASE_DIR / "media"
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# Authentication
+AUTH_USER_MODEL = "accounts.User"
+LOGIN_URL = "accounts:login"
+LOGIN_REDIRECT_URL = "recipe_list"
+LOGOUT_REDIRECT_URL = "recipe_list"
