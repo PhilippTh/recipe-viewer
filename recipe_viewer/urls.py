@@ -18,19 +18,16 @@ Including another URLconf
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
+from django.urls import include
 from django.urls import path
 
-from recipe_viewer.apps.recipes.views import recipe_detail
-from recipe_viewer.apps.recipes.views import recipe_ingredients
 from recipe_viewer.apps.recipes.views import recipe_list
-from recipe_viewer.apps.recipes.views import set_language
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("", recipe_list, name="recipe_list"),
-    path("recipe/<int:recipe_id>/", recipe_detail, name="recipe_detail"),
-    path("recipe/<int:recipe_id>/ingredients/", recipe_ingredients, name="recipe_ingredients"),  # type: ignore[arg-type]
-    path("set_language/", set_language, name="set_language"),
+    path("recipe/", include("recipe_viewer.apps.recipes.urls")),
+    path("accounts/", include("recipe_viewer.apps.accounts.urls")),
 ]
 
 # Serve media files in development

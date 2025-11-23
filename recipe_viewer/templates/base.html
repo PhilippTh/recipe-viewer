@@ -6,40 +6,73 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}{% trans "Recipe Viewer" %}{% endblock %}</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@1.0.0-RC.6/bundles/datastar.js"></script>
-    {% block extra_css %}{% endblock %}
+    <script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@1.0.0-RC.6/bundles/datastar.js" integrity="sha384-Unn1KaRhSVMdI+vhIPiXQm824XDletPh8zK2lEG0OnOYT1mEJ5EQ/cThD2FStY64" crossorigin="anonymous"></script>    {% block extra_css %}{% endblock %}
 </head>
 <body class="bg-gray-100 min-h-screen">
     
     <div class="container mx-auto p-4 max-w-7xl">
-        <!-- Language Switcher -->
-        <div class="flex justify-end mb-4">
-            <form action="{% url 'set_language' %}" method="post" id="language-form" class="flex items-center gap-2">
-                {% csrf_token %}
-                <input type="hidden" name="next" value="{{ request.path }}">
-                {% get_current_language as LANGUAGE_CODE %}
-                {% get_available_languages as LANGUAGES %}
-                <!-- Translation Icon -->
-                <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"></path>
-                </svg>
-                <select 
-                    name="language" 
-                    onchange="document.getElementById('language-form').submit()"
-                    class="text-gray-700 bg-transparent cursor-pointer"
+        <!-- Top Bar -->
+        <div class="flex items-center justify-between mb-4">
+            {% if request.resolver_match and request.resolver_match.url_name != 'recipe_list' %}
+                <a
+                    href="{% url 'recipe_list' %}"
+                    class="inline-flex items-center gap-2 text-base font-medium text-slate-700 hover:text-slate-900"
+                    title="{% trans 'Back' %}"
                 >
-                    {% for lang_code, lang_name in LANGUAGES %}
-                        <option value="{{ lang_code }}" {% if LANGUAGE_CODE == lang_code %}selected{% endif %}>
-                            {{ lang_name }}
-                        </option>
-                    {% endfor %}
-                </select>
-            </form>
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                    </svg>
+                    <span class="hidden sm:inline">{% trans "Back" %}</span>
+                </a>
+            {% else %}
+                <span class="w-5 h-5"></span>
+            {% endif %}
+
+            <div class="flex items-center gap-6">
+                <form action="{% url 'accounts:set_language' %}" method="post" id="language-form" class="flex items-center gap-2">
+                    {% csrf_token %}
+                    <input type="hidden" name="next" value="{{ request.path }}">
+                    {% get_current_language as LANGUAGE_CODE %}
+                    {% get_available_languages as LANGUAGES %}
+                    <!-- Translation Icon -->
+                    <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"></path>
+                    </svg>
+                    <select 
+                        name="language" 
+                        onchange="document.getElementById('language-form').submit()"
+                        class="text-gray-700 bg-transparent cursor-pointer"
+                    >
+                        {% for lang_code, lang_name in LANGUAGES %}
+                            <option value="{{ lang_code }}" {% if LANGUAGE_CODE == lang_code %}selected{% endif %}>
+                                {{ lang_name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </form>
+                <div class="flex items-center gap-2">
+                    {% if user.is_authenticated %}
+                        <form method="post" action="{% url 'accounts:logout' %}">
+                            {% csrf_token %}
+                            <button
+                                type="submit"
+                                class="text-gray-700 underline hover:no-underline"
+                            >
+                                {% trans "Log out" %}
+                            </button>
+                        </form>
+                    {% else %}
+                        <a
+                            href="{% url 'accounts:login' %}?next={{ request.get_full_path|urlencode }}"
+                            class="text-gray-700 underline hover:no-underline"
+                        >
+                            {% trans "Log in" %}
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
         </div>
-        
-        <div class="bg-white rounded-lg shadow-lg p-8">
-            {% block content %}{% endblock %}
-        </div>
+        {% block content %}{% endblock %}
     </div>
     
     {% block extra_js %}{% endblock %}
