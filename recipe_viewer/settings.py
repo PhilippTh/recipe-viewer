@@ -78,15 +78,25 @@ WSGI_APPLICATION = "recipe_viewer.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-# Use /app/data for SQLite in Docker, otherwise use project root
-DATABASE_DIR = Path("/app/data") if os.environ.get("DOCKER_ENV") else BASE_DIR
-
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": DATABASE_DIR / "db.sqlite3",
+# Use PostgreSQL in Docker (when POSTGRES_HOST is set), otherwise SQLite for local dev
+if os.environ.get("POSTGRES_HOST"):
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": os.environ.get("POSTGRES_DB", "recipe_viewer"),
+            "USER": os.environ.get("POSTGRES_USER", "recipe_viewer"),
+            "PASSWORD": os.environ.get("POSTGRES_PASSWORD", ""),
+            "HOST": os.environ.get("POSTGRES_HOST", "localhost"),
+            "PORT": os.environ.get("POSTGRES_PORT", "5432"),
+        }
     }
-}
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": str(BASE_DIR / "db.sqlite3"),
+        }
+    }
 
 
 # Password validation

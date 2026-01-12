@@ -1,4 +1,21 @@
 services:
+  db:
+    image: postgres:16-alpine
+    container_name: recipe_viewer_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB:-recipe_viewer}
+      - POSTGRES_USER=${POSTGRES_USER:-recipe_viewer}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    networks:
+      - recipe_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-recipe_viewer} -d ${POSTGRES_DB:-recipe_viewer}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
   web:
     build:
       context: .
@@ -6,7 +23,6 @@ services:
     container_name: recipe_viewer_web
     command: ./entrypoint.sh
     volumes:
-      - db_data:/app/data
       - media_data:/app/media
       - static_volume:/app/static
     environment:
@@ -14,11 +30,19 @@ services:
       - DEBUG=${DEBUG}
       - ALLOWED_HOSTS=${ALLOWED_HOSTS}
       - DOCKER_ENV=true
+      - POSTGRES_DB=${POSTGRES_DB:-recipe_viewer}
+      - POSTGRES_USER=${POSTGRES_USER:-recipe_viewer}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_HOST=db
+      - POSTGRES_PORT=5432
       - PORT=${PORT:-8000}
       - WORKERS=${WORKERS:-4}
       - LOG_LEVEL=${LOG_LEVEL:-info}
       - SKIP_MIGRATIONS=${SKIP_MIGRATIONS:-false}
       - SKIP_COLLECTSTATIC=${SKIP_COLLECTSTATIC:-false}
+    depends_on:
+      db:
+        condition: service_healthy
     networks:
       - recipe_network
 
@@ -38,7 +62,7 @@ services:
       - recipe_network
 
 volumes:
-  db_data:
+  postgres_data:
   media_data:
   static_volume:
 

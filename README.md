@@ -116,10 +116,12 @@ uv run python manage.py compilemessages
 
 ## TODOs
 
-- [ ] Add docker compose with postgres for deployment
+- [x] ~~Add docker compose with postgres for deployment~~
 - [ ] Add possibility to load initial recipes
 - [x] ~~Add proper views for adding and editing recipes (just possible in Django admin view)~~
 - [ ] Allow users to switch between tiles and table on the landing page
 - [ ] Add categories, tags, searching and filtering
 - [ ] Use compiled tailwind instead of default cdn
+- [ ] Add CI pipeline (GitHub Actions) for linting
+- [ ] Add Dependabot for dependency updates
 - [ ] AI?

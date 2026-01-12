@@ -8,6 +8,7 @@ dependencies = [
     "datastar-py>=0.7.0",
     "django>=5.2.8",
     "pillow>=12.0.0",
+    "psycopg[binary]>=3.1.8",
     "uvicorn>=0.38.0",
 ]
 
