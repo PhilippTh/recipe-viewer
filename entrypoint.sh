@@ -1,6 +1,16 @@
 #!/bin/sh
 set -e
 
+# Wait for PostgreSQL to be ready (if using PostgreSQL)
+if [ -n "$POSTGRES_HOST" ]; then
+    echo "Waiting for PostgreSQL at $POSTGRES_HOST:${POSTGRES_PORT:-5432}..."
+    while ! python -c "import socket; s = socket.socket(); s.settimeout(1); s.connect(('$POSTGRES_HOST', ${POSTGRES_PORT:-5432})); s.close()" 2>/dev/null; do
+        echo "PostgreSQL is unavailable - sleeping"
+        sleep 1
+    done
+    echo "PostgreSQL is available"
+fi
+
 # Run migrations (skip with SKIP_MIGRATIONS=true)
 if [ "${SKIP_MIGRATIONS:-false}" != "true" ]; then
     echo "Running database migrations..."
