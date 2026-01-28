@@ -35,6 +35,7 @@ class Command(BaseCommand):
         }
     ]
     """
+
     help = "Wipe recipes and import from JSON file"
 
     def add_arguments(self, parser):
@@ -62,10 +63,7 @@ class Command(BaseCommand):
 
         for entry in data:
             steps = entry.get("steps") or []
-            if isinstance(steps, list):
-                steps_text = "\n".join(steps)
-            else:
-                steps_text = str(steps)
+            steps_text = "\n".join(steps) if isinstance(steps, list) else str(steps)
 
             recipe = Recipe.objects.create(
                 name=entry.get("name", "").strip(),
@@ -83,8 +81,4 @@ class Command(BaseCommand):
                 )
                 ingredient_count += 1
 
-        self.stdout.write(
-            self.style.SUCCESS(
-                f"Imported {recipe_count} recipes and {ingredient_count} ingredients."
-            )
-        )
+        self.stdout.write(self.style.SUCCESS(f"Imported {recipe_count} recipes and {ingredient_count} ingredients."))
